@@ -1,0 +1,42 @@
+﻿@model IEnumerable<HTTP5101_Cumulative_Project_Part1.Models.Teacher>
+@{
+    ViewBag.Title = "List";
+}
+
+<h2 class="mx-auto" style="width: 700px;">Teacher's informations are listed on this page!</h2>
+
+<div class="alert alert-warning" role="alert">
+    Please click the teacher's id number to get the full details of the teacher
+</div>
+
+
+    <div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#Id</th>
+                    <th scope="col">First</th>
+                    <th scope="col">Last</th>
+                    <th scope="col">Employee Number</th>
+                    <th scope="col">Hire Date</th>
+                    <th scope="col">Salary</th>
+                </tr>
+            </thead>
+            @foreach (var teacher in Model)
+            {
+                <tbody>
+                    <tr>
+                        <th scope="row"><a href="/teacher/show/@teacher.TeacherId">@teacher.TeacherId</a></th>
+                        <td>@teacher.TeacherFirstName</td>
+                        <td>@teacher.TeacherLastName</td>
+                        <td>@teacher.EmployeeNumber</td>
+                        <td>@teacher.HireDate</td>
+                        <td>@teacher.Salary</td>
+                    </tr>
+                </tbody>
+            }
+            </table>
+    </div>
+ 
+           
+           

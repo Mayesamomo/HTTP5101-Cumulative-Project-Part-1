@@ -1,0 +1,31 @@
+﻿@model HTTP5101_Cumulative_Project_Part1.Models.Teacher
+
+@{
+    ViewBag.Title = "Show";
+}
+
+<h2>Show Teacher's Details'</h2>
+<div class="alert alert-success" role="alert">
+    <div class="alert-heading">
+        <strong> Full Name:</strong>
+           
+            <h3>@Model.TeacherFirstName @Model.TeacherLastName</h3>
+    </div>
+    <div>
+        <strong> Employee Number:</strong>
+
+        <p>
+
+            @Model.EmployeeNumber
+        </p>
+    </div>
+    <hr>
+    <div>
+        <strong>Hired Date:</strong>
+        <p class="mb-0">@Model.HireDate</p>
+    </div>
+    <div>
+        <strong>Salary:</strong>
+        <spans style="color:orangered;">@Model.Salary</spans>
+    </div>
+</div>
