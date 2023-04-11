@@ -3,9 +3,11 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Management.Instrumentation;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.WebPages;
 
 namespace HTTP5101_Cumulative_Project_Part1.Controllers
 {
@@ -14,9 +16,13 @@ namespace HTTP5101_Cumulative_Project_Part1.Controllers
         //get access to the database
         private SchoolDbContext school = new SchoolDbContext();
 
+        //search for teacher
         [HttpGet]
-        public IEnumerable<Teacher> ListTeacher()
+        [Route("api/TeacherData/ListTeachers/{SearchKey?}")]
+        public IEnumerable<Teacher> ListTeacher(string SearchKey = null)
         {
+            Teacher newTeacher = new Teacher();
+
             //create database connecion instance
             MySqlConnection conn = school.AccessDatabase();
 
@@ -27,19 +33,20 @@ namespace HTTP5101_Cumulative_Project_Part1.Controllers
             MySqlCommand cmd = conn.CreateCommand();
 
             // the sql query, select all from the techears' table
-            cmd.CommandText = "Select * from teachers";
+            cmd.CommandText = "Select * from teachers where lower(teacherfname) like lower(@key) or lower(teacherlname) like lower(@key) or lower(concat(teacherfname, ' ', teacherlname)) like lower(@key)";
+            cmd.Parameters.AddWithValue("@Key", "%" + SearchKey + "%");
 
-            //Gather the result of the retrieved query results into a variable
+            cmd.Prepare();
+            //Append Result set into a variable
             MySqlDataReader reader = cmd.ExecuteReader();
 
-            //create an empty list of teachers 
-            List<Teacher> TeacherDetails = new List<Teacher> { };
+            //create an empty list to store objects of Teachers
+            List<Teacher> teachers = new List<Teacher> { }; //in class question, what is the difference between using () and {} 
 
-            //loop throught the row of the result set and fetch deatils as required
-            while(reader.Read())
+            //loop through each row of the result set 
+            while (reader.Read())
             {
                 //access the column information by the database column name.
-
                 int TeacherId = (int)reader["teacherid"];
                 string Teacherfname = (string)reader["teacherfname"];
                 string Teacherlname = (string)reader["teacherlname"];
@@ -47,29 +54,25 @@ namespace HTTP5101_Cumulative_Project_Part1.Controllers
                 DateTime Hiredate = (DateTime)reader["hiredate"];
                 decimal Salary = (decimal)reader["salary"];
 
-                Teacher teacherobj = new Teacher();
 
-                teacherobj.TeacherId = TeacherId;
-                teacherobj.TeacherFirstName = Teacherfname;
-                teacherobj.TeacherLastName = Teacherlname;
-                teacherobj.EmployeeNumber = TEmployeeNum;
-                teacherobj.HireDate = Hiredate;
-                teacherobj.Salary = Salary;
-
-               // string teacherdetails = reader["teacherid"] + " " + reader["teacherfname"] + " " + reader["teacherlname"]
-                   // + " " + reader["employeenumber"] + " " + reader["hiredate"] + " " + reader["salary"];
-
-                //add resukt to the list
-                TeacherDetails.Add(teacherobj);
+                newTeacher.TeacherId = TeacherId;
+                newTeacher.TeacherFirstName = Teacherfname;
+                newTeacher.TeacherLastName = Teacherlname;
+                newTeacher.EmployeeNumber = TEmployeeNum;
+                newTeacher.HireDate = Hiredate;
+                newTeacher.Salary = Salary;
+                //Add the teacher's name to the List
+                teachers.Add(newTeacher);
             }
-            //data fetching done, close the connection 
+            //Close the connection between the MySQL Database and Server
             conn.Close();
 
-            // retunr the list of teachers
-            return TeacherDetails;
+            //Return the list of teacher's names
+            return teachers;
+
         }
 
-
+        //get Teacher by Id
 
         [HttpGet]
         public Teacher getTeacher(int id)
@@ -114,6 +117,10 @@ namespace HTTP5101_Cumulative_Project_Part1.Controllers
             conn.Close();
             return newTeacher;
         }
+
+
+        
+
     }
 }
 
